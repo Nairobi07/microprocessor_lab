@@ -8,7 +8,7 @@ DATA ENDS
 display MACRO msg
 	lea dx,msg
 	mov ah,09h
-	int 21
+	int 21h
 	ENDM
 
 printD MACRO 
@@ -16,7 +16,11 @@ printD MACRO
 	mov ah,02h
 	int 21h
 	ENDM
-
+printD MACRO 
+	add dl,30h
+	mov ah,02h
+	int 21h
+	ENDM
 CODE SEGMENT
 ASSUME CS:CODE,DS:DATA
 start: 	mov ax,DATA
@@ -30,18 +34,17 @@ start: 	mov ax,DATA
 	mov ah,01h
 	int 21h
 	sub al,30h
-	
 	mov bl,al
+	
 	display prompt2
+	
 	mov ah,01h
 	int 21h
 	sub al,30h
-	
 	mov ch,al
 	mov ah,01h
 	int 21h
 	sub al,30h
-	
 	mov cl,al
 	
 	cmp cx,bx
@@ -67,45 +70,40 @@ start: 	mov ax,DATA
 	
 	display msg1
 	mov dl,bh
-	add dl,30h
-	mov ah,02h
-	int 21h
+	printD
+	
+	
 	mov dl,bl
-	add dl,30h
-	mov ah,02h
-	int 21h
+	printD
+	
 	jmp terminate
 
-zero: 		display msg1
-		mov dl,00h
-		add dl,30h
-	mov ah,02h
-	int 21h
-
+zero: 	display msg1
+	mov dl,00h
+	printD
+	jmp terminate
+	
 negative:	mov al,cl
-		sub al,bl
-		mov ah,00h
-		aas
-		mov bl,ah
-		mov cl,al
+	sub al,bl
+	mov ah,00h
+	aas
+	mov bl,ah
+	mov cl,al
 		
-		mov al,ch
-		sub al,bh
-		mov ah,00h
-		aas
-		add al,bl
-		mov ch,al
-		display msg2
-		mov dl,ch
-		add dl,30h
-	mov ah,02h
-	int 21h
-		mov dl,cl
-		add dl,30h
-	mov ah,02h
-	int 21h
-terminate: 	mov ah,4ch
-		int 21h
-		CODE ENDS
-		END start
+	mov al,ch
+	sub al,bh
+	mov ah,00h
+	aas
+	add al,bl
+	mov ch,al
+	display msg2
+	mov dl,ch
+	printD
+	mov dl,cl
+	printD
+	
+terminate: mov ah,4ch
+	 int 21h
+	 CODE ENDS
+	 END start
 	
